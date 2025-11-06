@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conferir Nota Fiscal</title>
+    <title>Conferir Nota Fiscal - Loja 168</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .mock-table th, .mock-table td {
@@ -253,7 +253,7 @@
             <div class="bg-white p-8 rounded-lg shadow-md">
                 <div class="text-center mb-8">
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">Sistema de Conferência</h1>
-                    <p class="text-gray-600">Faça login para continuar</p>
+                    <p class="text-gray-600">Loja 168 - Faça login para continuar</p>
                 </div>
                 
                 <div class="mb-6">
@@ -308,7 +308,7 @@
             <header class="mb-6 print-hidden">
                 <div class="flex justify-between items-center">
                     <h1 class="text-3xl font-extrabold text-gray-900 md:px-0 px-4">
-                        Conferir Nota Fiscal
+                        Conferir Nota Fiscal - Loja 168
                     </h1>
                     <button onclick="logout()" class="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-800 rounded-lg shadow-sm hover:bg-gray-200 transition duration-150 text-sm font-medium border border-gray-300">
                         <span>Sair</span>
@@ -348,9 +348,9 @@
 
     <script>
         // =========================================================================
-        // CONFIGURAÇÃO PARA ONLINE - MUDANÇA PRINCIPAL
+        // 🔥 CONFIGURAÇÃO ESPECÍFICA PARA LOJA 168 - CORRIGIDO
         // =========================================================================
-        const BACKEND_URL = "https://back-end-nfe.onrender.com"; // URL do backend online
+        const BACKEND_URL = "https://loja168mh.gtgo.com.br"; // ✅ SUBDOMÍNIO CORRETO DA LOJA 168
         const USER_ID = "web-user-123";
         
         // =========================================================================
@@ -378,8 +378,9 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                    'Origin': window.location.origin // ✅ IMPORTANTE: Envia o origin correto
                     },
-                    credentials: 'include',
+                    credentials: 'include', // ✅ IMPORTANTE: Inclui cookies
                     body: JSON.stringify({
                         username: username,
                         password: password
