@@ -348,13 +348,13 @@
 
     <script>
         // =========================================================================
-        // 🔥 CONFIGURAÇÃO ESPECÍFICA PARA LOJA 168 - CORRIGIDO
+        // CONFIGURAÇÃO CORRIGIDA - USANDO URL DO RENDER DIRETAMENTE
         // =========================================================================
-        const BACKEND_URL = "https://loja168mh.gtgo.com.br"; // ✅ SUBDOMÍNIO CORRETO DA LOJA 168
+        const BACKEND_URL = "https://back-end-nfe.onrender.com";
         const USER_ID = "web-user-123";
         
         // =========================================================================
-        // SISTEMA DE AUTENTICAÇÃO
+        // SISTEMA DE AUTENTICAÇÃO CORRIGIDO
         // =========================================================================
 
         let currentUser = null;
@@ -378,14 +378,21 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                    'Origin': window.location.origin // ✅ IMPORTANTE: Envia o origin correto
                     },
-                    credentials: 'include', // ✅ IMPORTANTE: Inclui cookies
+                    credentials: 'include',
                     body: JSON.stringify({
                         username: username,
                         password: password
                     })
                 });
+
+                // Verifica se a resposta é JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('Resposta não é JSON:', textResponse.substring(0, 200));
+                    throw new Error('Servidor retornou HTML em vez de JSON');
+                }
 
                 const result = await response.json();
 
@@ -403,8 +410,8 @@
                 hideNotification();
                 console.error('Erro no login:', error);
                 
-                if (error.message.includes('401')) {
-                    showNotification('Usuário ou senha incorretos', 'error');
+                if (error.message.includes('JSON')) {
+                    showNotification('Erro de conexão com o servidor', 'error');
                 } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
                     showNotification('Erro de conexão com o servidor', 'error');
                 } else {
@@ -492,7 +499,7 @@
                         return response;
                     }
                     
-                    console.log('🔐 Sessão expirada para rota protegida:', url);
+                    console.log('Sessão expirada para rota protegida:', url);
                     
                     // Verifica novamente com check-auth para confirmar
                     const authCheck = await fetch(`${BACKEND_URL}/api/check-auth`, {
@@ -501,7 +508,7 @@
                     });
                     
                     if (authCheck.status === 401) {
-                        console.log('✅ Confirmação: sessão realmente expirada');
+                        console.log('Confirmação: sessão realmente expirada');
                         showNotification('Sessão expirada. Faça login novamente.', 'error');
                         
                         // Pequeno delay antes do logout
@@ -511,7 +518,7 @@
                             }
                         }, 2000);
                     } else {
-                        console.log('❌ Falso positivo - sessão ainda válida');
+                        console.log('Falso positivo - sessão ainda válida');
                         // Não faz logout - pode ser um erro específico da rota
                     }
                 }
@@ -598,7 +605,7 @@
                 const hasData = Object.keys(cachedData).filter(key => key.startsWith('A')).length > 0;
                 
                 if (hasData) {
-                    console.log('🔄 Auto-save: Saindo da Contagem Loja, enviando dados...');
+                    console.log('Auto-save: Saindo da Contagem Loja, enviando dados...');
                     showNotification('Salvando dados da contagem...', 'loading', 2000);
                     
                     processBatchUpdate();
@@ -619,7 +626,7 @@
                     const hasData = Object.keys(cachedData).filter(key => key.startsWith('A')).length > 0;
                     
                     if (hasData) {
-                        console.log('🔄 Tentando salvar antes de sair...');
+                        console.log('Tentando salvar antes de sair...');
                         
                         fetch(`${BACKEND_URL}/api/batch-update-sheet`, {
                             method: 'POST',
@@ -653,10 +660,10 @@
             const cachedData = loadFromCache(cacheKey);
             const currentCacheCount = Object.keys(cachedData).filter(key => key.startsWith('A')).length;
             
-            console.log(`🔍 Monitor Cache: ${lastCacheCount} -> ${currentCacheCount}`);
+            console.log(`Monitor Cache: ${lastCacheCount} -> ${currentCacheCount}`);
             
             if (currentCacheCount !== lastCacheCount) {
-                console.log(`🔄 Mudança detectada no cache! Resetando timer de 5 minutos.`);
+                console.log(`Mudança detectada no cache! Resetando timer de 5 minutos.`);
                 lastCacheCount = currentCacheCount;
                 resetCacheChangeTimer();
                 return true;
@@ -677,7 +684,7 @@
                 checkAndAutoSaveByCache();
             }, CACHE_CHANGE_TIMEOUT);
             
-            console.log(`⏰ Timer de cache resetado: 5 minutos`);
+            console.log(`Timer de cache resetado: 5 minutos`);
         }
 
         /**
@@ -692,7 +699,7 @@
                 const hasData = Object.keys(cachedData).filter(key => key.startsWith('A')).length > 0;
                 
                 if (hasData) {
-                    console.log('🔄 Auto-save por inatividade de cache: 5 minutos sem alterações');
+                    console.log('Auto-save por inatividade de cache: 5 minutos sem alterações');
                     showNotification('Salvando dados automaticamente...', 'loading', 3000);
                     processBatchUpdate();
                 }
@@ -713,7 +720,7 @@
             const cachedData = loadFromCache(cacheKey);
             lastCacheCount = Object.keys(cachedData).filter(key => key.startsWith('A')).length;
             
-            console.log(`🔍 Iniciando monitor de cache. Contagem inicial: ${lastCacheCount}`);
+            console.log(`Iniciando monitor de cache. Contagem inicial: ${lastCacheCount}`);
             
             setInterval(() => {
                 checkCacheChange();
@@ -1166,7 +1173,7 @@
             const hasData = Object.keys(cachedDataCurrent).filter(key => key.startsWith('A')).length > 0;
             
             if (hasData) {
-                console.log(`🔄 Auto-save: Saindo do ${currentContador}, enviando dados...`);
+                console.log(`Auto-save: Saindo do ${currentContador}, enviando dados...`);
                 showNotification(`Salvando dados do ${currentContador}...`, 'loading', 2000);
                 await processBatchUpdate();
             }
@@ -1456,12 +1463,12 @@
             const timeSinceLastSound = now - lastSoundTime;
             
             if (timeSinceLastSound < SOUND_COOLDOWN) {
-                console.log(`⏸️ Som ignorado: Cooldown ativo (${timeSinceLastSound}ms < ${SOUND_COOLDOWN}ms)`);
+                console.log(`Som ignorado: Cooldown ativo (${timeSinceLastSound}ms < ${SOUND_COOLDOWN}ms)`);
                 return false;
             }
             
             soundCount++;
-            console.log(`🎵 TOCANDO SOM ${soundCount}`);
+            console.log(`TOCANDO SOM ${soundCount}`);
             playErrorSound();
             lastSoundTime = now;
             return true;
@@ -1495,7 +1502,7 @@
                 try {
                     console.log('\x07');
                 } catch (fallbackError) {
-                    console.log('❌ Nenhum método de áudio funcionou');
+                    console.log('Nenhum método de áudio funcionou');
                 }
             }
         }
@@ -1664,6 +1671,14 @@
                     body: JSON.stringify({ sheet_name: sheetName })
                 });
 
+                // Verifica se é JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('Resposta não é JSON:', textResponse.substring(0, 200));
+                    throw new Error('Servidor retornou HTML em vez de JSON');
+                }
+
                 const result = await response.json();
 
                 if (!response.ok || result.error) {
@@ -1678,7 +1693,7 @@
             } catch (error) {
                 hideNotification();
                 console.error("Erro na comunicação para buscar dados:", error);
-                showNotification(`Erro de Rede/CORS ao buscar dados para ${sheetName}.`, 'error');
+                showNotification(`Erro de Rede ao buscar dados para ${sheetName}.`, 'error');
                 return [];
             }
         }
@@ -1698,6 +1713,14 @@
                     credentials: 'include',
                     body: JSON.stringify({ xml_content: xmlContent, user_id: USER_ID })
                 });
+
+                // Verifica se é JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('Resposta não é JSON:', textResponse.substring(0, 200));
+                    throw new Error('Servidor retornou HTML em vez de JSON');
+                }
 
                 const result = await response.json();
                 hideNotification();
@@ -1743,6 +1766,14 @@
                     credentials: 'include',
                     body: JSON.stringify({ chaveAcesso })
                 });
+
+                // Verifica se é JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('Resposta não é JSON:', textResponse.substring(0, 200));
+                    throw new Error('Servidor retornou HTML em vez de JSON');
+                }
 
                 const result = await response.json();
                 hideNotification();
